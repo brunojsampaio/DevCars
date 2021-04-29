@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using DevCars.API.Persistence;
 using Microsoft.AspNetCore.Builder;
@@ -30,13 +32,27 @@ namespace DevCars.API
         {
             var connectionString = Configuration.GetConnectionString("DevCarsCs");
             
-            services.AddDbContext<DevCarsDbContext>(options => options.UseNpgsql(connectionString));
-            // services.AddDbContext<DevCarsDbContext>(options => options.UseInMemoryDatabase("DevCars"));
+            //services.AddDbContext<DevCarsDbContext>(options => options.UseNpgsql(connectionString));
+            services.AddDbContext<DevCarsDbContext>(options => options.UseInMemoryDatabase("DevCars"));
             
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "DevCars.API", Version = "v1"});
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "DevCars.API", 
+                    Version = "v1",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Bruno Sampaio",
+                        Email = "brunojsampaio@gmail.com",
+                        Url = new Uri("http://brunojsampaio.wordpress.com/")
+                    }
+                });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
         }
 
